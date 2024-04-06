@@ -27,7 +27,7 @@ export default async function TicketPage({ searchParams }: { searchParams: Searc
   if (!tickets) return (
     <div className="p-4 h-screen flex flex-col justify-center items-center">
       <h1 className="text-2xl font-bold">Tickets</h1>
-      <p>Couldn't fetch Tickets at this time. Try again later</p>
+      <p>Couldn&apos;t fetch Tickets at this time. Try again later</p>
     </div>
   )
   

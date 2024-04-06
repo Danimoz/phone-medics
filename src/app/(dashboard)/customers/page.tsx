@@ -12,7 +12,7 @@ export default async function Customers({ searchParams }: { searchParams: { [key
   if (!customers) return (
     <div className="p-4 h-screen flex justify-center items-center">
       <h1 className="text-2xl font-bold">Customers</h1>
-      <p>Couldn't fetch Customers at this time. Try again later</p>
+      <p>Couldn&apos;t fetch Customers at this time. Try again later</p>
     </div>
   )
 

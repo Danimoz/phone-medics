@@ -20,7 +20,7 @@ export default async function StaffPage({ searchParams }: { searchParams: Search
   if (!staffs) return (
     <div className="p-4 h-screen flex justify-center items-center">
       <h1 className="text-2xl font-bold">Staffs</h1>
-      <p>Couldn't fetch Staffs at this time</p>
+      <p>Couldn&apos;t fetch Staffs at this time</p>
     </div>
   )
 

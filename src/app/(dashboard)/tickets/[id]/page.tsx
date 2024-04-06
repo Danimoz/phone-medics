@@ -12,7 +12,7 @@ export default async function SingleTicket({ params }: { params: { id: string } 
         <CardHeader>
           <CardTitle>Single Ticket</CardTitle>
         </CardHeader>
-        <p>Couldn't fetch Ticket at this time. Try again later</p>
+        <p>Couldn&apos;t fetch Ticket at this time. Try again later</p>
       </Card>
     </main>
   )
