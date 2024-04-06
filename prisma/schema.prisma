@@ -1,0 +1,173 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  firstName String
+  lastName  String
+  password  String
+  isAdmin   Boolean     @default(false)
+  inventory Inventory[]
+  tickets   Ticket[]
+  createdAt DateTime    @default(now())
+  Customer  Customer[]
+  Service   Service[]
+}
+
+model Inventory {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  sku           String
+  description   String
+  price         Float
+  quantity      Int
+  isActive      Boolean
+  costPrice     Float
+  userId        Int
+  user          User            @relation(fields: [userId], references: [id])
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  inventoryItem InventoryItem[]
+}
+
+model Ticket {
+  id           Int           @id @default(autoincrement())
+  seller       User          @relation(fields: [sellerId], references: [id])
+  sellerId     Int
+  customer     Customer      @relation(fields: [customerId], references: [id])
+  customerId   Int
+  status       TicketStatus  @default(OPEN)
+  type         TicketType
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  payment      Payment[]
+  saleTicket   SaleTicket?
+  repairTicket RepairTicket?
+  price        Float
+}
+
+model SaleTicket {
+  id             Int             @id @default(autoincrement())
+  ticket         Ticket          @relation(fields: [ticketId], references: [id])
+  ticketId       Int             @unique
+  itemsSold      InventoryItem[]
+  serviceForSale ServiceItem[]
+}
+
+model InventoryItem {
+  id             Int           @id @default(autoincrement())
+  inventory      Inventory     @relation(fields: [inventoryId], references: [id])
+  inventoryId    Int
+  quantity       Int
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  saleTicket     SaleTicket?   @relation(fields: [saleTicketId], references: [id])
+  saleTicketId   Int?
+  repairTicket   RepairTicket? @relation(fields: [repairTicketId], references: [id])
+  repairTicketId Int?
+}
+
+model RepairTicket {
+  id                Int              @id @default(autoincrement())
+  ticket            Ticket           @relation(fields: [ticketId], references: [id])
+  ticketId          Int              @unique
+  itemUsedForRepair InventoryItem[]
+  repairable        RepairableItem[]
+  serviceForRepair  ServiceItem[]
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum TicketType {
+  SALE
+  REPAIR
+}
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String?
+  email     String?
+  phone     String?
+  createdBy User     @relation(fields: [userId], references: [id])
+  tickets   Ticket[]
+  createdAt DateTime @default(now())
+  userId    Int
+}
+
+model Payment {
+  id        Int           @id @default(autoincrement())
+  ticket    Ticket        @relation(fields: [ticketId], references: [id])
+  ticketId  Int
+  amount    Float
+  method    PaymentMethod
+  note      String?
+  createdAt DateTime      @default(now())
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+  OTHER
+}
+
+model Service {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  description String?
+  sku         String
+  createdAt   DateTime      @default(now())
+  createdBy   User          @relation(fields: [userId], references: [id])
+  userId      Int
+  serviceItem ServiceItem[]
+}
+
+model Repairable {
+  id             Int              @id @default(autoincrement())
+  name           String
+  problem        String
+  repairableItem RepairableItem[]
+}
+
+model RepairableItem {
+  id             Int           @id @default(autoincrement())
+  repairable     Repairable    @relation(fields: [repairableId], references: [id])
+  repairableId   Int
+  quantity       Int
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  RepairTicket   RepairTicket? @relation(fields: [repairTicketId], references: [id])
+  repairTicketId Int?
+}
+
+model ServiceItem {
+  id             Int           @id @default(autoincrement())
+  service        Service       @relation(fields: [serviceId], references: [id])
+  serviceId      Int
+  amount         Float
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  RepairTicket   RepairTicket? @relation(fields: [repairTicketId], references: [id])
+  repairTicketId Int?
+  SaleTicket     SaleTicket?   @relation(fields: [saleTicketId], references: [id])
+  saleTicketId   Int?
+}
