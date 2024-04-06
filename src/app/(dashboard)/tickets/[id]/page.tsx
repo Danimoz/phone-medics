@@ -74,8 +74,7 @@ export default async function SingleTicket({ params }: { params: { id: string } 
                 {ticket.repairTicket.repairable?.map((repairable) => (
                   <div key={repairable.id}>
                     <p className="font-semibold">{repairable.repairable.name}</p>
-                    <p className="text-sm">Problem: {repairable.repairable.problem}</p>
-                    <p className="text-sm">Quantity: {repairable.quantity}</p>
+                    <p className="text-sm">Problem: {repairable.problem}</p>
                   </div>
                 ))}
               </div>
