@@ -28,14 +28,19 @@ export async function GET(request: Request) {
 
     const report = tickets.map((ticket) => {
       const items = ticket.saleTicket
-        ? ticket.saleTicket.itemsSold.map((item) => item.inventory.name)
-        : ticket.repairTicket?.itemUsedForRepair.map((item) => item.inventory.name);
+        ? ticket.saleTicket.itemsSold
+        : ticket.repairTicket?.itemUsedForRepair;
+      
+      const costPrice = items?.reduce((acc, item) => acc + item.inventory.costPrice, 0);
+      const profit = ticket.price - costPrice!;
 
       return {
         id: ticket.id,
+        costPrice,
         price: ticket.price,
         date: ticket.createdAt,
-        items: items?.join(', '),
+        profit,
+        items: items?.map((item) => item.inventory.name).join(', '),
         amountPaid: ticket.payment.reduce((acc, payment) => acc + payment.amount, 0),
       };
     });

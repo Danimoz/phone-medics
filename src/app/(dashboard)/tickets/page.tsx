@@ -56,6 +56,7 @@ export default async function TicketPage({ searchParams }: { searchParams: Searc
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
+              <TableHead>ID</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Customer</TableHead>
@@ -69,6 +70,7 @@ export default async function TicketPage({ searchParams }: { searchParams: Searc
             {(tickets as TTicket[])?.map((ticket) => (
               <TableRow key={ticket.id}>
                 <TableCell>{ticket.createdAt.toLocaleString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' })}</TableCell>
+                <TableCell>{ticket.id}</TableCell>
                 <TableCell>{ticket.type}</TableCell>
                 <TableCell>{ticket.status}</TableCell>
                 <TableCell>{ticket.customer.firstName} {ticket.customer.lastName}</TableCell>

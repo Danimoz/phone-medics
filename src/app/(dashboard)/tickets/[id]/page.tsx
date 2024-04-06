@@ -25,6 +25,7 @@ export default async function SingleTicket({ params }: { params: { id: string } 
         </CardHeader>
         <CardContent className="grid gap-2">
           <h2 className="text-xl font-bold uppercase">{ticket.type === "SALE" ? "Sale" : "Repair"} Ticket</h2>
+          <h3 className="text-lg font-semibold">ID: {ticket.id}</h3>
           <p className="text-sm">Date: {new Date(ticket.createdAt).toDateString()}</p>
           {ticket.saleTicket && (
             <>

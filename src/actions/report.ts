@@ -30,10 +30,14 @@ export async function calculateDailySales({ startDate, endDate, page }: { startD
     const report = tickets.map((ticket) => {
       // check if ticket is a sale or repair then return the items sold or used for repair
       const items = ticket.saleTicket ? ticket.saleTicket.itemsSold : ticket.repairTicket?.itemUsedForRepair
+      const costPrice = items?.reduce((acc, item) => acc + item.inventory.costPrice, 0)
+      const profit = ticket.price - costPrice!;
       return {
         id: ticket.id,
+        costPrice,
         price: ticket.price,
         date: ticket.createdAt,
+        profit,
         items: items?.map((item) => item.inventory.name).join(', '),
         amountPaid: ticket.payment.reduce((acc, payment) => acc + payment.amount, 0)
       }

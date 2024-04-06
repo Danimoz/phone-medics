@@ -144,3 +144,22 @@ export async function getRepairables(){
     return { message: "Couldn't fetch Repairables at this time. Try again later", status: 400 }
   }
 }
+
+export async function editProduct(id: number, formData: FormData){
+  const name = formData.get('name') as string;
+  const price = parseFloat(formData.get('price') as string);
+  const costPrice = parseFloat(formData.get('costPrice') as string);
+
+  try {
+    await prisma.inventory.update({
+      where: { id },
+      data: { name, price, costPrice }
+    })
+    revalidatePath('/products')
+    revalidatePath('/tickets/new')
+    return { message: 'Product edited Successfully', status: 200 }
+  } catch (error) {
+    console.error(error)
+    return { message: "Couldn't edit Product at this time. Try again later", status: 400 }
+  }
+}

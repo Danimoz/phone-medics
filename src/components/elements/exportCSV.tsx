@@ -17,7 +17,7 @@ export default function ExportCSV({ startDate, endDate }: { startDate: string, e
     }
     const { report } = await res.json();
     // add the header row
-    report.unshift({ id: 'ID', price: 'Price', date: 'Date', items: 'Items', amountPaid: 'Amount Paid' });
+    report.unshift({ id: 'ID', costPrice:"Cost Price", price: 'Price', date: 'Date', profit: 'Profit', items: 'Items', amountPaid: 'Amount Paid' });
     const csv = report.map((row:any) => Object.values(row).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const a = document.createElement('a');
