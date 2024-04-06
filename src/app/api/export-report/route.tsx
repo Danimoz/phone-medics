@@ -5,12 +5,18 @@ export async function GET(request: Request) {
   const startDate = searchParams.get('startDate') || new Date().toISOString().split('T')[0];
   const endDate = searchParams.get('endDate') || new Date().toISOString().split('T')[0];
 
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+
   try {
     const tickets = await prisma.ticket.findMany({
       where: {
         createdAt: {
-          gte: new Date(startDate),
-          lte: new Date(endDate)
+          gte: new Date(start),
+          lte: new Date(end)
         }
       },
       include: {

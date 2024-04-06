@@ -32,7 +32,7 @@ export default function SaleTicketForm({ customers, products, services }: SaleTi
   const { replace } = useRouter();
   
   const [selectedProducts, setSelectedProducts] = useState([
-    { productName: '', quantity: 0, productId: 0 }
+    { productName: '', quantity: 0, productId: 0, price: 0, productPrice: 0 }
   ])
 
   const [selectedServices, setSelectedServices] = useState([
@@ -78,6 +78,7 @@ export default function SaleTicketForm({ customers, products, services }: SaleTi
       setSelectedProducts((prev) => {
         const newSelectedProducts = [...prev]
         newSelectedProducts[index].quantity = parseInt(value)
+        newSelectedProducts[index].price =  newSelectedProducts[index].productPrice * Number(value)
         return newSelectedProducts
       })
     }
@@ -90,9 +91,23 @@ export default function SaleTicketForm({ customers, products, services }: SaleTi
       })
     } else {
       setSelectedProducts((prev) => {
-        return [...prev, { productName: '', quantity: 0, productId: 0 }]
+        return [...prev, { productName: '', quantity: 0, productId: 0, price: 0, productPrice: 0 }]
       })
     }
+  }
+
+  async function fetchProductPrice(productId: number, index: number){
+    const response = await fetch(`/api/get-price/?productId=${productId}`)
+    if (!response.ok) {
+      toast.error('An error occurred while getting the price')
+      return
+    }
+    const data = await response.json()
+    setSelectedProducts((prev) => {
+      const newSelectedProducts = [...prev]
+      newSelectedProducts[index].productPrice = data.price
+      return newSelectedProducts
+    });
   }
 
   async function handleSubmit(formData: FormData){
@@ -106,7 +121,7 @@ export default function SaleTicketForm({ customers, products, services }: SaleTi
       return { id: product.productId, quantity: product.quantity }
     })
   
-    const services = selectedServices.filter((service) => service.id !== 0).map((service) => {
+    const services = selectedServices.filter((service) => service.amount !== 0 || service.id !== 0).map((service) => {
       return { id: service.id, amount: service.amount }
     })
 
@@ -223,6 +238,7 @@ export default function SaleTicketForm({ customers, products, services }: SaleTi
                                   const newSelectedProducts = [...prev]
                                   newSelectedProducts[index].productName = currentValue
                                   newSelectedProducts[index].productId = parseInt(product.value)
+                                  fetchProductPrice(parseInt(product.value), index)
                                   return newSelectedProducts
                                 })
                               }}
@@ -239,6 +255,7 @@ export default function SaleTicketForm({ customers, products, services }: SaleTi
                 <div className="w-full">
                   <Input type="number" placeholder="Quantity" onChange={(e) => handleQuantityChange(index, e.target.value, 'product')} min='0' required />
                 </div>
+                <p className="text-lg w-full">Price: ₦ {selectedProduct.price}</p>
                 {index !== 0 && (
                   <Button variant='destructive' onClick={() => handleDeleteItem(index, 'product')}>Remove</Button>
                 )}

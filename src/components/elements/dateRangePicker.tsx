@@ -26,7 +26,7 @@ export default function DateRangePicker(){
       </div>
       <div>
         <Label htmlFor="endDate">End Date</Label>
-        <Input type="date" id="endDate" value={endDate} />
+        <Input type="date" id="endDate" value={endDate} onChange={(e) => handleChange('end', e.target.value)} />
       </div>
     </div>
   )

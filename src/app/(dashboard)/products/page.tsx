@@ -1,10 +1,9 @@
 import { getItems } from "@/actions/inventory";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import ProductActions from "./actions";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import Search from "@/components/elements/search";
 import Pagination from "@/components/elements/pagination";
+import ProductsCSV from "./productsCSV";
 
 export default async function Products({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined }}){
   const page = typeof searchParams.page === 'string' ? parseInt(searchParams.page) : 1;
@@ -16,6 +15,8 @@ export default async function Products({ searchParams }: { searchParams: { [key:
     <div className="p-4">
       <h1 className="text-2xl font-bold">Products</h1>
 
+      <ProductsCSV />
+      
       <section className="border shadow-sm rounded-lg mt-6">
         <Search placeholder='Search Products ...' />
 

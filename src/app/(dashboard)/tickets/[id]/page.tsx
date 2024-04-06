@@ -18,7 +18,7 @@ export default async function SingleTicket({ params }: { params: { id: string } 
   )
 
   return (
-    <main className="container p-4">
+    <main className="container p-4 overflow-y-auto">
       <Card>
         <CardHeader>
           <CardTitle>Ticket Details</CardTitle>

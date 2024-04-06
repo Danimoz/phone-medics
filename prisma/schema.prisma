@@ -144,7 +144,6 @@ model Service {
 model Repairable {
   id             Int              @id @default(autoincrement())
   name           String
-  problem        String
   repairableItem RepairableItem[]
 }
 
@@ -152,7 +151,7 @@ model RepairableItem {
   id             Int           @id @default(autoincrement())
   repairable     Repairable    @relation(fields: [repairableId], references: [id])
   repairableId   Int
-  quantity       Int
+  problem        String
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   RepairTicket   RepairTicket? @relation(fields: [repairTicketId], references: [id])

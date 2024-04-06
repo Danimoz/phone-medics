@@ -122,11 +122,10 @@ export async function getServices(){
 
 export async function addRepairable(formData: FormData){
   const name = formData.get('name') as string
-  const problem = formData.get('problem') as string
 
   try {
     await prisma.repairable.create({
-      data: { name, problem }
+      data: { name }
     })
     revalidatePath('/tickets/new')
     return { message: 'Repairable added Successfully', status: 201 }

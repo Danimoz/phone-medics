@@ -1,12 +1,18 @@
 import prisma from "@/lib/prisma"
 
 export async function calculateDailySales({ startDate, endDate, page }: { startDate: string, endDate: string, page: number }) { 
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+  
   try {
     const tickets = await prisma.ticket.findMany({
       where: {
         createdAt: {
-          gte: new Date(startDate),
-          lte: new Date(endDate)
+          gte: new Date(start),
+          lte: new Date(end)
         }
       },
       include: {

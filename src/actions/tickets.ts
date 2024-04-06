@@ -7,16 +7,16 @@ import { Prisma } from "@prisma/client";
 
 interface saleData {
   customer: number;
-  items: { id: number; quantity: number}[];
+  items: { id: number; quantity: number }[];
   services: { id: number, amount: number }[];
   payment: { price: number; method: 'CASH' | 'CARD' | 'TRANSFER' | 'OTHER'; note?: string };
 }
 
 interface repairData {
   customer: number;
-  products: { productName: string; quantity: number; productId: number }[];
+  products: { productName: string; quantity: number; productId: number,}[];
   services: { serviceName: string; id: number; amount: number }[];
-  repairables: { repairableName: string; id: number; quantity: number;}[];
+  repairables: { repairableName: string; id: number; problem: string }[];
   payment: { amount: number; method: 'CASH' | 'CARD' | 'TRANSFER' | 'OTHER'; note?: string };
 }
 
@@ -95,6 +95,22 @@ export async function newSaleTicket(data: saleData) {
       return { message: 'You are not authorized to perform this action', status: 401 }
     }
 
+    const quantityCheck = await prisma.inventory.findMany({
+      where: { id: { in: data.items.map(item => item.id) } }
+    })
+          
+    const invalidItems = quantityCheck.filter((item, index) => {
+      return item.quantity < data.items[index].quantity;
+    });
+    
+    // If there are any invalid items, return an error response
+    if (invalidItems.length > 0) {
+      return {
+        message: invalidItems.map(item => `You can't sell more than ${item.quantity} of ${item.name}`).join(', '),
+        status: 400
+      };
+    }
+
     await prisma.$transaction(async (tx) => {
       const ticket = await tx.ticket.create({
         data: {
@@ -144,6 +160,8 @@ export async function newSaleTicket(data: saleData) {
     })
 
     revalidatePath('/tickets')
+    revalidatePath('/')
+
     return { message: 'Ticket created Successfully', status: 201 }
   } catch (error) {
     console.error(error)
@@ -159,6 +177,21 @@ export async function newRepairTicket(data: repairData) {
       return { message: 'You are not authorized to perform this action', status: 401 }
     }
 
+    const quantityCheck = await prisma.inventory.findMany({
+      where: { id: { in: data.products.map(item => item.productId) } }
+    })
+          
+    const invalidItems = quantityCheck.filter((item, index) => {
+      return item.quantity < data.products[index].quantity;
+    });
+    
+    // If there are any invalid items, return an error response
+    if (invalidItems.length > 0) {
+      return {
+        message: invalidItems.map(item => `You can't sell more than ${item.quantity} of ${item.name}`).join(', '),
+        status: 400
+      };
+    }
 
     await prisma.$transaction(async (tx) => {
       const ticket = await tx.ticket.create({
@@ -169,7 +202,7 @@ export async function newRepairTicket(data: repairData) {
           repairTicket: {
             create: {
               repairable: {
-                createMany: { data: data.repairables.map(repairable => ({ repairableId: repairable.id, quantity: repairable.quantity })) }
+                createMany: { data: data.repairables.map(repairable => ({ repairableId: repairable.id, problem: repairable.problem })) }
               },
               serviceForRepair: {
                 createMany: { data: data.services.map(service => ({ serviceId: service.id, amount: service.amount })) }
@@ -208,6 +241,7 @@ export async function newRepairTicket(data: repairData) {
     })
 
     revalidatePath('/tickets')
+    revalidatePath('/')
     return { message: 'Ticket created Successfully', status: 201 }
   } catch (error) {
     console.error(error)
@@ -227,7 +261,8 @@ export async function getAllTickets({ page, type, search }: { page: number, type
         payment: true
       },
       skip: (page - 1) * 40,
-      take: 40
+      take: 40,
+      orderBy: { createdAt: 'desc' }
     };
 
     const whereClause: any = {};

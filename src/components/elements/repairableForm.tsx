@@ -30,7 +30,6 @@ export default function RepairableForm() {
     // Add Data to FormData
     const data = new FormData();
     data.append('name', formData.name);
-    data.append('problem', formData.problem);
 
     const res = await addRepairable(data);
     if (res.status !== 201) {
@@ -50,10 +49,6 @@ export default function RepairableForm() {
       <div className="mb-2 space-y-2">
         <Label htmlFor="name">Name</Label>
         <Input name="name" id="name" className="h-8" value={formData.name} onChange={handleChange} required />
-      </div>
-      <div className="mb-2 space-y-2">
-        <Label htmlFor="problem">Problem</Label>
-        <Textarea name="problem" id="problem" value={formData.problem} onChange={handleChange} />
       </div>
 
       <Button onClick={handleSubmit}>

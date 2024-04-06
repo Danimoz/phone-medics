@@ -41,7 +41,7 @@ export default function RepairTicketForm({ customers, products, services, repair
   const { replace } = useRouter();
 
   const [selectedProducts, setSelectedProducts] = useState([
-    { productName: '', quantity: 0, productId: 0 }
+    { productName: '', quantity: 0, productId: 0, price: 0, productPrice: 0 }
   ])
 
   const [selectedServices, setSelectedServices] = useState([
@@ -49,7 +49,7 @@ export default function RepairTicketForm({ customers, products, services, repair
   ])
 
   const [selectedRepairables, setSelectedRepairables] = useState([
-    { repairableName: '', id: 0, quantity: 0 }
+    { repairableName: '', id: 0, problem: '' }
   ])
 
   const customersNames = customers?.map(({ firstName, lastName, id }) => {
@@ -96,13 +96,14 @@ export default function RepairTicketForm({ customers, products, services, repair
         setSelectedProducts((prev) => {
           const newSelectedProducts = [...prev]
           newSelectedProducts[index].quantity = parseInt(value)
+          newSelectedProducts[index].price = newSelectedProducts[index].productPrice * parseInt(value)
           return newSelectedProducts
         })
         break
       case 'repairable':
         setSelectedRepairables((prev) => {
           const newSelectedRepairables = [...prev]
-          newSelectedRepairables[index].quantity = parseInt(value)
+          newSelectedRepairables[index].problem = value
           return newSelectedRepairables
         })
         break
@@ -123,11 +124,11 @@ export default function RepairTicketForm({ customers, products, services, repair
       })
     } else if (type === 'product') {
       setSelectedProducts((prev) => {
-        return [...prev, { productName: '', quantity: 0, productId: 0 }]
+        return [...prev, { productName: '', quantity: 0, productId: 0, price: 0, productPrice: 0 }]
       })
     } else {
       setSelectedRepairables((prev) => {
-        return [...prev, { repairableName: '', id: 0, quantity: 0 }]
+        return [...prev, { repairableName: '', id: 0, problem: '' }]
       })
     }
   }
@@ -138,9 +139,9 @@ export default function RepairTicketForm({ customers, products, services, repair
       return
     }
 
-    const products = selectedProducts.filter((product) => product.productId !== 0)
-    const services = selectedServices.filter((service) => service.id !== 0)
-    const repairables = selectedRepairables.filter((repairable) => repairable.id !== 0)
+    const products = selectedProducts.filter((product) => product.quantity !== 0 || product.productId !== 0 )
+    const services = selectedServices.filter((service) => service.amount !== 0 || service.id !== 0 )
+    const repairables = selectedRepairables.filter((repairable) => !repairable.problem || repairable.id !== 0)
 
     if (products.length === 0 && services.length === 0 && repairables.length === 0) {
       toast.error('Please add at least one item')
@@ -166,6 +167,20 @@ export default function RepairTicketForm({ customers, products, services, repair
     }
     toast.success(response.message)
     replace('/tickets')
+  }
+
+  async function fetchProductPrice(productId: number, index: number){
+    const response = await fetch(`/api/get-price/?productId=${productId}`)
+    if (!response.ok) {
+      toast.error('An error occurred while getting the price')
+      return
+    }
+    const data = await response.json()
+    setSelectedProducts((prev) => {
+      const newSelectedProducts = [...prev]
+      newSelectedProducts[index].productPrice = data.price
+      return newSelectedProducts
+    });
   }
 
   return (
@@ -266,7 +281,7 @@ export default function RepairTicketForm({ customers, products, services, repair
                   </PopoverContent>
                 </Popover>
                 <div className="w-full">
-                  <Input type="number" placeholder="Quantity" onChange={(e) => handleQuantityChange(index, e.target.value, 'repairable')} min='0' />
+                  <Input placeholder="Problem" onChange={(e) => handleQuantityChange(index, e.target.value, 'repairable')} />
                 </div>
                 {index !== 0 && (
                   <Button variant='destructive' onClick={() => handleDeleteItem(index, 'repairable')}>Remove</Button>
@@ -316,6 +331,7 @@ export default function RepairTicketForm({ customers, products, services, repair
                                   const newSelectedProducts = [...prev]
                                   newSelectedProducts[index].productName = currentValue
                                   newSelectedProducts[index].productId = parseInt(product.value)
+                                  fetchProductPrice(parseInt(product.value), index)
                                   return newSelectedProducts
                                 })
                               }}
@@ -332,6 +348,7 @@ export default function RepairTicketForm({ customers, products, services, repair
                 <div className="w-full">
                   <Input type="number" placeholder="Quantity" onChange={(e) => handleQuantityChange(index, e.target.value, 'product')} min='0' />
                 </div>
+                <p className="w-full">₦ {selectedProduct.price.toLocaleString()}</p>
                 {index !== 0 && (
                   <Button variant='destructive' onClick={() => handleDeleteItem(index, 'product')}>Remove</Button>
                 )}
