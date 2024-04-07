@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { compare, hash } from 'bcryptjs';
 import { SignJWT, jwtVerify } from "jose";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -31,7 +32,7 @@ export async function signUp(prevState: any, formData: FormData) {
     await prisma.user.create({
       data: { email, password: hashedPassword, firstName, lastName }
     });
-
+    revalidatePath('/staff')
     return { message: "User Successfully Created", status: 201 }
   } catch (error) {
     console.error(error)
@@ -120,11 +121,18 @@ export async function updateSession(request: NextRequest) {
 
 export async function getStaffs(page: number, search?: string) {
   try {
-    const where:any = {
-      OR: [
-        { firstName: { contains: search, mode: 'insensitive' } },
-        { lastName: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
+    const where: any = {
+      AND: [
+        {
+          OR: [
+            { firstName: { contains: search, mode: 'insensitive' } },
+            { lastName: { contains: search, mode: 'insensitive' } },
+            { email: { contains: search, mode: 'insensitive' } },
+          ]
+        },
+        {
+          isAdmin: false
+        }
       ]
     };
 

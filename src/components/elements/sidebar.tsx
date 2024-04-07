@@ -1,6 +1,7 @@
 import { getSession } from "@/actions/auth";
 import { BoxIcon, HomeIcon, Settings, Ticket, UserIcon } from "lucide-react";
 import Link from "next/link";
+import Logout from "./logout";
 
 
 export default async function Sidebar(){
@@ -15,7 +16,6 @@ export default async function Sidebar(){
   if (user && user.isAdmin) {
     sidebarItems.push({ icon: <BoxIcon />, name: 'Inventory', link: '/inventory' })
   }
-  sidebarItems.push ({ icon: <Settings />, name: 'Settings', link: '/settings' })
 
   return (
     <div className="border-r border-gray-200 dark:border-gray-700 flex flex-col w-64 min-h-screen shadow-xl">
@@ -34,6 +34,7 @@ export default async function Sidebar(){
               <span>{name}</span>
             </Link>
           ))}
+          <Logout />
         </div>
       </nav>
     </div>

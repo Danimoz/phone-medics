@@ -277,6 +277,7 @@ export async function getAllTickets({ page, type, search }: { page: number, type
         { customer: { lastName: { contains: search, mode: 'insensitive' } } },
         { seller: { firstName: { contains: search, mode: 'insensitive' } } },
         { seller: { lastName: { contains: search, mode: 'insensitive' } } },
+        { id: parseInt(search)},
         { saleTicket: { itemsSold: { some: { inventory: { name: { contains: search, mode: 'insensitive' } } } } } },
         { saleTicket: { serviceForSale: { some: { service: { name: { contains: search, mode: 'insensitive' }} } } } },
         { repairTicket: { itemUsedForRepair: { some: { inventory: { name: { contains: search, mode: 'insensitive' } } } } } },

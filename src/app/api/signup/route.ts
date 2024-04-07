@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { hash } from 'bcryptjs';
+import { revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
   // This route creates admin users
@@ -16,6 +17,7 @@ export async function POST(request: Request) {
     await prisma.user.create({
       data: { email, password: hashedPassword, firstName, lastName, isAdmin: true }
     });
+    revalidatePath('/staff')
     return Response.json({ message: "Admin User Successfully Created"}, { status: 201 })
   } catch(error) {
     console.error(error)
