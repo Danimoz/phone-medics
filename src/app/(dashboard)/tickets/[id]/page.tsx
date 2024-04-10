@@ -131,7 +131,7 @@ export default async function SingleTicket({ params }: { params: { id: string } 
         </CardContent>
       </Card>
 
-      <div className="flex justify-between gap-4">
+      <div className="flex justify-between gap-4 items-center">
         <PrintInvoice />
         <CloseTicket ticketId={ticket.id} status={ticket.status} />
       </div>
