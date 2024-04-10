@@ -358,3 +358,47 @@ export async function closeTicket(id: number) {
     return { message: "Couldn't update Ticket at this time. Try again later", status: 400 };
   }
 }
+
+export async function addItemToTicket(ticketId: number, itemId: number, quantity: number, type: 'SALE' | 'REPAIR'){
+  try {
+    const item = await prisma.inventory.findUnique({ where: { id: itemId } });
+    if (item && item?.quantity < quantity) {
+      return { message: `You can't add more than ${item.quantity} of ${item.name}`, status: 400 }
+    }
+
+    if (type === 'SALE'){
+      await prisma.saleTicket.update({
+        where: { id: ticketId },
+        data: { itemsSold: { create: { inventoryId: itemId, quantity } } }
+      });
+    } else {
+      await prisma.repairTicket.update({
+        where: { id: ticketId },
+        data: { itemUsedForRepair: { create: { inventoryId: itemId, quantity } } }
+      });    
+    }
+
+    revalidatePath('/tickets')
+    return { message: 'Ticket Closed Successfully', status: 200 }
+
+  } catch (error) {
+    console.error(error)
+    return { message: "Couldn't add Item to Ticket at this time. Try again later", status: 400 }
+  }
+}
+
+
+export async function addRepairableToTicket(ticketId: number, repairableId: number, problem: string){
+  try {
+    await prisma.repairTicket.update({
+      where: { id: ticketId },
+      data: { repairable: { create: { repairableId, problem } } }
+    });
+
+    revalidatePath('/tickets')
+    return { message: 'Repairable Added Successfully', status: 200 }
+  } catch (error) {
+    console.error(error)
+    return { message: "Couldn't add Repairable to Ticket at this time. Try again later", status: 400 }
+  }
+}

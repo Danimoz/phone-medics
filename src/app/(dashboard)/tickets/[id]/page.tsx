@@ -3,9 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AddPayment from "./addPayment";
 import PrintInvoice from "./printInvoice";
 import CloseTicket from "./closeTicket";
+import { getSession } from "@/actions/auth";
+import AddItemModal from "@/components/elements/addItemModal";
+import AddRepairableModal from "@/components/elements/addRepairableModal";
 
 export default async function SingleTicket({ params }: { params: { id: string } }) {
   const { ticket } = await getSingleTicket(Number(params.id));
+  const { user } = await getSession();
   
   if (!ticket) return (
     <main className="container p-4">
@@ -33,12 +37,17 @@ export default async function SingleTicket({ params }: { params: { id: string } 
             <>
               <div>
                 <h3 className="text-lg font-semibold">Items: </h3>
-                {ticket.saleTicket?.itemsSold?.map((item) => (
-                  <div key={item.id}>
-                    <p className="font-semibold">{item.inventory.name}</p>
-                    <p className="text-sm">Quantity: {item.quantity}</p>
-                  </div>
-                ))}
+                <div className="flex justify-between gap-4">
+                  {ticket.saleTicket?.itemsSold?.map((item) => (
+                    <div key={item.id}>
+                      <p className="font-semibold">{item.inventory.name}</p>
+                      <p className="text-sm">Quantity: {item.quantity}</p>
+                    </div>
+                  ))}
+                  {user.isAdmin && (
+                    <AddItemModal id={ticket.saleTicket.id} type={ticket.type} />
+                  )}
+                </div>
               </div>
               <div>
                 <h3 className="text-lg font-semibold">Services: </h3>
@@ -56,12 +65,18 @@ export default async function SingleTicket({ params }: { params: { id: string } 
             <>
               <div>
                 <h3 className="text-lg font-semibold">Items: </h3>
-                {ticket.repairTicket.itemUsedForRepair?.map((item) => (
-                  <div key={item.id}>
-                    <p className="font-semibold">{item.inventory.name}</p>
-                    <p className="text-sm">Quantity: {item.quantity}</p>
-                  </div>
-                ))}
+                <div className="flex justify-between gap-4"> 
+                  {ticket.repairTicket.itemUsedForRepair?.map((item) => (
+                    <div key={item.id}>
+                      <p className="font-semibold">{item.inventory.name}</p>
+                      <p className="text-sm">Quantity: {item.quantity}</p>
+                    </div>
+                  ))}
+
+                  {user.isAdmin && (
+                    <AddItemModal id={ticket.repairTicket.id} type={ticket.type} /> 
+                  )}
+                </div>
               </div>
               <div>
                 <h3 className="text-lg font-semibold">Services: </h3>
@@ -74,12 +89,18 @@ export default async function SingleTicket({ params }: { params: { id: string } 
               </div>
               <div>
                 <h3 className="text-lg font-semibold">Repairables: </h3>
-                {ticket.repairTicket.repairable?.map((repairable) => (
-                  <div key={repairable.id}>
-                    <p className="font-semibold">{repairable.repairable.name}</p>
-                    <p className="text-sm">Problem: {repairable.problem}</p>
-                  </div>
-                ))}
+                <div className="flex gap-x-4 justify-between">
+                  {ticket.repairTicket.repairable?.map((repairable) => (
+                    <div key={repairable.id}>
+                      <p className="font-semibold">{repairable.repairable.name}</p>
+                      <p className="text-sm">Problem: {repairable.problem}</p>
+                    </div>
+                  ))}
+
+                  {user.isAdmin && (
+                    <AddRepairableModal id={ticket.repairTicket.id} />
+                  )}
+                </div>
               </div>
             </>
           )}

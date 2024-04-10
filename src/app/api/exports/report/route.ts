@@ -39,7 +39,7 @@ export async function GET(request: Request) {
         date: ticket.createdAt,
         id: ticket.id,
         customer: ticket.customer?.firstName + ' ' + ticket.customer?.lastName,
-        items: items?.map((item) => item.inventory.name).join(', '),
+        items: items?.map((item) => item.inventory.name).join(' '),
         costPrice,
         price: ticket.price,
         amountPaid: ticket.payment.reduce((acc, payment) => acc + payment.amount, 0),

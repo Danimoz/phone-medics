@@ -17,6 +17,7 @@ export async function calculateDailySales({ startDate, endDate, page }: { startD
       },
       include: {
         payment: true,
+        customer: true,
         saleTicket: { include: { itemsSold: { include: { inventory: true }} }},
         repairTicket: { include: { itemUsedForRepair: { include: { inventory: true }} }}
       },
@@ -35,6 +36,7 @@ export async function calculateDailySales({ startDate, endDate, page }: { startD
       return {
         id: ticket.id,
         costPrice,
+        customer: ticket.customer?.firstName + ' ' + ticket.customer?.lastName,
         price: ticket.price,
         date: ticket.createdAt,
         profit,

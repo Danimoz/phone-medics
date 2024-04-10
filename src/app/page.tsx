@@ -53,24 +53,26 @@ export default async function Home({ searchParams }: { searchParams: { startDate
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
+                <TableHead>ID</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Items</TableHead>
                 <TableHead>Cost Price</TableHead>
                 <TableHead>Sale Price</TableHead>
                 <TableHead>Amount Paid</TableHead>
                 <TableHead>Profit</TableHead>
-                <TableHead>Items</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {dailySales?.report.map((sale) => (
                 <TableRow key={sale.id}>
                   <TableCell>{new Date(sale.date).toDateString()}</TableCell>
+                  <TableCell>{sale.id}</TableCell>
+                  <TableCell>{sale.customer}</TableCell>
+                  <TableCell>{sale.items}</TableCell>
                   <TableCell>₦ {sale.costPrice?.toLocaleString()}</TableCell>
                   <TableCell>₦ {sale.price.toLocaleString()}</TableCell>
                   <TableCell>₦ {sale.amountPaid.toLocaleString()}</TableCell>
                   <TableCell>₦ {sale.profit.toLocaleString()}</TableCell>
-                  <TableCell className="overflow-x-auto">
-                    {sale.items}
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
