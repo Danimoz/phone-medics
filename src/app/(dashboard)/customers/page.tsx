@@ -2,6 +2,7 @@ import { getPaginatedCustomers } from "@/actions/tickets"
 import Pagination from "@/components/elements/pagination";
 import Search from "@/components/elements/search";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import ExportCustomers from "./exportCustomers";
 
 
 export default async function Customers({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined }}) {
@@ -20,6 +21,8 @@ export default async function Customers({ searchParams }: { searchParams: { [key
     <div className="p-4">
       <h1 className="text-2xl font-bold">Customers</h1>
 
+      <ExportCustomers />
+      
       <section className="border shadow-sm rounded-lg mt-6">
         <Search placeholder='Search Customers ...' />
 
