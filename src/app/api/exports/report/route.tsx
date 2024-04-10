@@ -21,6 +21,7 @@ export async function GET(request: Request) {
       },
       include: {
         payment: true,
+        customer: true,
         saleTicket: { include: { itemsSold: { include: { inventory: true }} }},
         repairTicket: { include: { itemUsedForRepair: { include: { inventory: true }} }}
       }
@@ -35,13 +36,14 @@ export async function GET(request: Request) {
       const profit = ticket.price - costPrice!;
 
       return {
+        date: ticket.createdAt,
         id: ticket.id,
+        customer: ticket.customer?.firstName + ' ' + ticket.customer?.lastName,
+        items: items?.map((item) => item.inventory.name).join(', '),
         costPrice,
         price: ticket.price,
-        date: ticket.createdAt,
-        profit,
-        items: items?.map((item) => item.inventory.name).join(', '),
         amountPaid: ticket.payment.reduce((acc, payment) => acc + payment.amount, 0),
+        profit,
       };
     });
 

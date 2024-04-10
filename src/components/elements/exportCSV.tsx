@@ -9,7 +9,7 @@ export default function ExportCSV({ startDate, endDate }: { startDate: string, e
 
   async function getCSV() {
     setLoading(true);
-    const res = await fetch('/api/export/report?startDate=' + startDate + '&endDate=' + endDate);
+    const res = await fetch('/api/exports/report?startDate=' + startDate + '&endDate=' + endDate);
     if (!res.ok) {
       toast.error('An error occurred');
       setLoading(false);
@@ -17,7 +17,7 @@ export default function ExportCSV({ startDate, endDate }: { startDate: string, e
     }
     const { report } = await res.json();
     // add the header row
-    report.unshift({ id: 'ID', costPrice:"Cost Price", price: 'Price', date: 'Date', profit: 'Profit', items: 'Items', amountPaid: 'Amount Paid' });
+    report.unshift({ date: 'Date', id: 'ID', customer: 'Customer', items: 'Items', costPrice:"Cost Price", price: 'Sale Price',  amountPaid: 'Amount Paid', profit: 'Profit' });
     const csv = report.map((row:any) => Object.values(row).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const a = document.createElement('a');
