@@ -1,32 +1,30 @@
-'use client'
+'use client';
 
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { toast } from "sonner";
 
-export default function ProductsCSV(){
+export default function ExportCustomers() {
   const [loading, setLoading] = useState(false);
 
   async function getCSV() {
     setLoading(true);
-    const res = await fetch('/api/exports/products');
+    const res = await fetch('/api/exports/customers');
     if (!res.ok) {
-      toast.error('An error occurred');
       setLoading(false);
       return
     }
-    const { products } = await res.json();
-    products.unshift({ id: 'ID', name: 'Name', sku: 'SKU', costPrice: 'Cost Price', price: 'Price', quantity: 'Quantity' });
-    const csv = products.map((row:any) => Object.values(row).join(',')).join('\n');
+    const { customers } = await res.json();
+    customers.unshift({ id: 'ID', firstName: 'First Name', lastName: 'LastName', email: 'Email', phone: 'Phone', createdAt: 'Date Created', userID: 'Created by' });
+    const csv = customers.map((row: any) => Object.values(row).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const a = document.createElement('a');
     const url = URL.createObjectURL(blob);
     a.href = url;
-    a.setAttribute('download', 'products.csv');
+    a.setAttribute('download', 'customers.csv');
     a.click();
     setLoading(false);
   }
-
+  
   return (
     <div className="mt-6">
       <Button size='sm' variant='default' onClick={getCSV}>

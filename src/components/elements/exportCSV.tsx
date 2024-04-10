@@ -9,7 +9,7 @@ export default function ExportCSV({ startDate, endDate }: { startDate: string, e
 
   async function getCSV() {
     setLoading(true);
-    const res = await fetch('/api/export-report?startDate=' + startDate + '&endDate=' + endDate);
+    const res = await fetch('/api/export/report?startDate=' + startDate + '&endDate=' + endDate);
     if (!res.ok) {
       toast.error('An error occurred');
       setLoading(false);

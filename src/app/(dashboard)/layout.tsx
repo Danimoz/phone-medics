@@ -16,7 +16,7 @@ export default function DahsboardLayout({
       <div className="w-full flex-none md:w-64">
         <SideNav />
       </div>
-      <div className="flex-1 flex flex-col gap-4 p-4 min-h-screen">{children}</div>
+      <div className="flex-1 flex flex-col gap-4 p-4 min-h-screen overflow-y-auto">{children}</div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { getSingleTicket } from "@/actions/tickets";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AddPayment from "./addPayment";
 import PrintInvoice from "./printInvoice";
+import CloseTicket from "./closeTicket";
 
 export default async function SingleTicket({ params }: { params: { id: string } }) {
   const { ticket } = await getSingleTicket(Number(params.id));
@@ -18,7 +19,7 @@ export default async function SingleTicket({ params }: { params: { id: string } 
   )
 
   return (
-    <main className="container p-4 overflow-y-auto">
+    <main className="container p-4">
       <Card>
         <CardHeader>
           <CardTitle>Ticket Details</CardTitle>
@@ -26,6 +27,7 @@ export default async function SingleTicket({ params }: { params: { id: string } 
         <CardContent className="grid gap-2">
           <h2 className="text-xl font-bold uppercase">{ticket.type === "SALE" ? "Sale" : "Repair"} Ticket</h2>
           <h3 className="text-lg font-semibold">ID: {ticket.id}</h3>
+          <h3 className="text-lg font-semibold">Status: {ticket.status}</h3>
           <p className="text-sm">Date: {new Date(ticket.createdAt).toDateString()}</p>
           {ticket.saleTicket && (
             <>
@@ -129,7 +131,10 @@ export default async function SingleTicket({ params }: { params: { id: string } 
         </CardContent>
       </Card>
 
-      <PrintInvoice />
+      <div className="flex justify-between gap-4">
+        <PrintInvoice />
+        <CloseTicket ticketId={ticket.id} status={ticket.status} />
+      </div>
 
     </main>
   );

@@ -272,17 +272,24 @@ export async function getAllTickets({ page, type, search }: { page: number, type
     }
 
     if (search) {
-      whereClause.OR = [
-        { customer: { firstName: { contains: search, mode: 'insensitive' } } },
-        { customer: { lastName: { contains: search, mode: 'insensitive' } } },
-        { seller: { firstName: { contains: search, mode: 'insensitive' } } },
-        { seller: { lastName: { contains: search, mode: 'insensitive' } } },
-        { id: parseInt(search)},
-        { saleTicket: { itemsSold: { some: { inventory: { name: { contains: search, mode: 'insensitive' } } } } } },
-        { saleTicket: { serviceForSale: { some: { service: { name: { contains: search, mode: 'insensitive' }} } } } },
-        { repairTicket: { itemUsedForRepair: { some: { inventory: { name: { contains: search, mode: 'insensitive' } } } } } },
-        { repairTicket: { serviceForRepair: { some: { service: { name: { contains: search, mode: 'insensitive' } } } } } },
-      ];
+      if (isNaN(parseInt(search))) {
+        whereClause.OR = [
+          { customer: { firstName: { contains: search, mode: 'insensitive' } } },
+          { customer: { lastName: { contains: search, mode: 'insensitive' } } },
+          { seller: { firstName: { contains: search, mode: 'insensitive' } } },
+          { seller: { lastName: { contains: search, mode: 'insensitive' } } },
+          { saleTicket: { itemsSold: { some: { inventory: { name: { contains: search, mode: 'insensitive' } } } } } },
+          { saleTicket: { serviceForSale: { some: { service: { name: { contains: search, mode: 'insensitive' }} } } } },
+          { repairTicket: { itemUsedForRepair: { some: { inventory: { name: { contains: search, mode: 'insensitive' } } } } } },
+          { repairTicket: { serviceForRepair: { some: { service: { name: { contains: search, mode: 'insensitive' } } } } } },
+        ];
+      } else {
+        whereClause.OR = [
+          { id: parseInt(search)},
+          { price: parseInt(search)},
+          { payment: { amount: parseInt(search)}}
+        ];
+      }
     }
 
     if (Object.keys(whereClause).length > 0) {
@@ -330,6 +337,22 @@ export async function addPayment(id: number, data: { amount: number; method: 'CA
 
     revalidatePath('/tickets')
     return { message: 'Payment Added Successfully', status: 200 }
+  } catch (error) {
+    console.error(error);
+    return { message: "Couldn't update Ticket at this time. Try again later", status: 400 };
+  }
+}
+
+
+export async function closeTicket(id: number) {
+  try {
+    await prisma.ticket.update({
+      where: { id },
+      data: { status: 'COMPLETED' }
+    });
+
+    revalidatePath('/tickets')
+    return { message: 'Ticket Closed Successfully', status: 200 }
   } catch (error) {
     console.error(error);
     return { message: "Couldn't update Ticket at this time. Try again later", status: 400 };
